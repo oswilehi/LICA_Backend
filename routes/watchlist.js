@@ -5,8 +5,34 @@ const assert = require("assert");
 var connection = require("../middleware/connection");
 const ObjectId = require("mongodb").ObjectID;
 
-/* GET movies */
-router.get("/", async function (req, res, next) {
+/**
+ * @swagger
+ * tags:
+ *   name: Watch list
+ *   description: The watch list managing API
+ */
+
+/**
+ * @swagger
+ * /watchlist/{user}:
+ *  get:
+ *    summary: Retrieve the movies of a user from a watch list.
+ *    tags: [Watch list]
+ *    description: Retrieve the movies of a user from a watch list.
+ *    parameters:
+ *      - in: path
+ *        name: user
+ *        required: true
+ *        description: Email that has this specific watch list.
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: A list from movies.
+ *      403:
+ *        description: Unauthorized
+ */
+router.get("/:user", async function (req, res, next) {
   const client = new MongoClient(connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -17,7 +43,7 @@ router.get("/", async function (req, res, next) {
     const result = await client
       .db("LICA")
       .collection("watchlist")
-      .find()
+      .find({ user: req.params.user })
       .toArray();
     console.log(result);
     res.status(200).send(result);
@@ -29,8 +55,33 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-/* GET movie */
-router.get("/:id", async function (req, res, next) {
+/**
+ * @swagger
+ * /watchlist/{id}/{user}:
+ *  get:
+ *    summary: Retrieve a specific movie from a user.
+ *    tags: [Watch list]
+ *    description: Retrieve a specific movie from a user.
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: Id of the movie.
+ *        schema:
+ *          type: integer
+ *      - in: path
+ *        name: user
+ *        required: true
+ *        description: Email that has this specific watch list.
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: A list from movies.
+ *      403:
+ *        description: Unauthorized
+ */
+router.get("/:id/:user", async function (req, res, next) {
   const client = new MongoClient(connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -42,7 +93,7 @@ router.get("/:id", async function (req, res, next) {
     const result = await client
       .db("LICA")
       .collection("watchlist")
-      .findOne({ _id: parseInt(req.params.id) });
+      .findOne({ _id: parseInt(req.params.id), user: req.params.user });
     console.log(result);
     res.status(200).send(result);
   } catch (e) {
@@ -53,7 +104,40 @@ router.get("/:id", async function (req, res, next) {
   }
 });
 
-/* POST add movie*/
+/**
+ * @swagger
+ * /watchlist:
+ *  post:
+ *    summary: Add a movie to user watch list.
+ *    tags: [Watch list]
+ *    requestBody:
+ *      description: Create a json that represents a movie you want to add to your watchlist.
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              _id:
+ *                type: integer
+ *                description: The movie ID.
+ *                example: 123
+ *              image:
+ *                type: string
+ *                description: The poster path of the movie.
+ *                example: /toyStory.jpg
+ *              user:
+ *                type: string
+ *                description: User that belongs the movie.
+ *                example: oswilehi@gmail.com
+ *    responses:
+ *      200:
+ *        description: The movie was added to your watchlist
+ *      403:
+ *        description: Unauthorized
+ *      500:
+ *        description: Some server error
+ */
 router.post("/", async function (req, res, next) {
   console.log("HOLAAAAAAA");
   var client;
@@ -67,6 +151,7 @@ router.post("/", async function (req, res, next) {
     const movie = {
       _id: req.body.id,
       image: req.body.image,
+      user: req.body.user,
     };
 
     await client.connect();
@@ -83,8 +168,33 @@ router.post("/", async function (req, res, next) {
   }
 });
 
-/* DELETE movie*/
-router.delete("/:id", async function (req, res, next) {
+/**
+ * @swagger
+ * /watchlist/{id}/{user}:
+ *  delete:
+ *    summary: Delete movie of user from watch list.
+ *    tags: [Watch list]
+ *    description: Delete movie of user from watch list.
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: Id of the movie.
+ *        schema:
+ *          type: integer
+ *      - in: path
+ *        name: user
+ *        required: true
+ *        description: Email that wants to delete the movie.
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: The movie was deleted.
+ *      403:
+ *        description: Unauthorized
+ */
+router.delete("/:id/:user", async function (req, res, next) {
   const client = new MongoClient(connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -95,7 +205,7 @@ router.delete("/:id", async function (req, res, next) {
     const result = await client
       .db("LICA")
       .collection("watchlist")
-      .deleteOne({ _id: parseInt(req.params.id) });
+      .deleteOne({ _id: parseInt(req.params.id), user: req.params.user });
     res.status(200).send("TAMOS BIEN");
   } catch (e) {
     console.log(e);
@@ -105,8 +215,33 @@ router.delete("/:id", async function (req, res, next) {
   }
 });
 
-/* PUT delete movie and insert it into watched*/
-router.put("/:id", async function (req, res, next) {
+/**
+ * @swagger
+ * /watchlist/{id}/{user}:
+ *  put:
+ *    summary: Moves movie from watch list to watched.
+ *    tags: [Watch list]
+ *    description: Moves movie from watch list to watched.
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        description: Id of the movie.
+ *        schema:
+ *          type: integer
+ *      - in: path
+ *        name: user
+ *        required: true
+ *        description: Email that wants to move the movie.
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: The movie was moved to watched.
+ *      403:
+ *        description: Unauthorized
+ */
+router.put("/:id/:user", async function (req, res, next) {
   const client = new MongoClient(connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -118,7 +253,7 @@ router.put("/:id", async function (req, res, next) {
     let result = await client
       .db("LICA")
       .collection("watchlist")
-      .findOne({ _id: parseInt(req.params.id) });
+      .findOne({ _id: parseInt(req.params.id), user: req.params.user });
 
     await client.db("LICA").collection("watched").insertOne(result);
 
