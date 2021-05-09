@@ -65,9 +65,9 @@ router.get("/:user", async function (req, res, next) {
  *      - in: path
  *        name: id
  *        required: true
- *        description: Id of the movie.
+ *        description: Id of the movie and the user that has that movie.
  *        schema:
- *          type: integer
+ *          type: string
  *      - in: path
  *        name: user
  *        required: true
@@ -112,7 +112,7 @@ router.put("/:id/:user", async function (req, res, next) {
 
 /**
  * @swagger
- * /watched/{id}/{user}:
+ * /watched/{id}:
  *  delete:
  *    summary: Delete movie of user from watched.
  *    tags: [Watched]
@@ -121,13 +121,7 @@ router.put("/:id/:user", async function (req, res, next) {
  *      - in: path
  *        name: id
  *        required: true
- *        description: Id of the movie.
- *        schema:
- *          type: integer
- *      - in: path
- *        name: user
- *        required: true
- *        description: Email that wants to delete the movie.
+ *        description: Id of the movie and the user that has that movie.
  *        schema:
  *          type: string
  *    responses:

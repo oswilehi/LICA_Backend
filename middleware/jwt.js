@@ -1,4 +1,3 @@
-const jwt = require("json-web-token");
 const { createRemoteJWKSet } = require("jose/jwks/remote");
 const { jwtVerify } = require("jose/jwt/verify");
 
@@ -15,11 +14,9 @@ const validate = async (req, res, next) => {
 
     return next();
   } catch (e) {
-    console.log(e);
+    console.log(e.message);
     return res.status(403).json({ code: 403, message: "Unauthorized" });
   }
 };
 
-module.exports = {
-  validate,
-};
+module.exports = { validate };
