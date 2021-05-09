@@ -93,7 +93,7 @@ router.get("/:id/:user", async function (req, res, next) {
     const result = await client
       .db("LICA")
       .collection("watchlist")
-      .findOne({ _id: parseInt(req.params.id), user: req.params.user });
+      .findOne({ _id: req.params.id });
     console.log(result);
     res.status(200).send(result);
   } catch (e) {
@@ -149,7 +149,8 @@ router.post("/", async function (req, res, next) {
     });
 
     const movie = {
-      _id: req.body.id,
+      _id: req.body.id + req.body.user,
+      id: req.body.id,
       image: req.body.image,
       user: req.body.user,
     };
@@ -194,7 +195,7 @@ router.post("/", async function (req, res, next) {
  *      403:
  *        description: Unauthorized
  */
-router.delete("/:id/:user", async function (req, res, next) {
+router.delete("/:id", async function (req, res, next) {
   const client = new MongoClient(connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -202,10 +203,9 @@ router.delete("/:id/:user", async function (req, res, next) {
 
   try {
     await client.connect();
-    const result = await client
-      .db("LICA")
-      .collection("watchlist")
-      .deleteOne({ _id: parseInt(req.params.id), user: req.params.user });
+    const result = await client.db("LICA").collection("watchlist").deleteOne({
+      _id: req.params.id,
+    });
     res.status(200).send("TAMOS BIEN");
   } catch (e) {
     console.log(e);
@@ -253,7 +253,10 @@ router.put("/:id/:user", async function (req, res, next) {
     let result = await client
       .db("LICA")
       .collection("watchlist")
-      .findOne({ _id: parseInt(req.params.id), user: req.params.user });
+      .findOne({ _id: req.params.id });
+
+    console.log(typeof result._id);
+    console.log(typeof req.params.id, typeof req.params.user);
 
     await client.db("LICA").collection("watched").insertOne(result);
 
