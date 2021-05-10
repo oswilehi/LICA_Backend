@@ -3,7 +3,6 @@ const { jwtVerify } = require("jose/jwt/verify");
 
 const validate = async (req, res, next) => {
   const JWKS = createRemoteJWKSet(new URL(process.env.COGNITO_URL));
-  console.log(req.headers.authorization);
   var token = req.headers.authorization;
 
   try {
