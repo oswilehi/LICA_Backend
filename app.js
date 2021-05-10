@@ -46,6 +46,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/watchlist", validate, watchlistRouter);
 app.use("/watched", validate, watchedRouter);
+app.get("/", (req, res, next) => {
+  res.status(200).send("CORRECT");
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
